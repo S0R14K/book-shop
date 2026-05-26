@@ -4,7 +4,7 @@ A full-featured online bookstore web application built with Flask, featuring use
 
 ## Features
 
-✨ **User Features**
+ **User Features**
 - User registration and login with secure password hashing
 - Browse and search for books with filters (price, category)
 - Add books to shopping cart
@@ -14,14 +14,14 @@ A full-featured online bookstore web application built with Flask, featuring use
 - User profile management
 - Currency conversion (EUR to other currencies)
 
-🛠️ **Admin Features**
+ **Admin Features**
 - Admin dashboard with statistics
 - Add, edit, and delete books
 - Manage book categories
 - View and update order status
 - Book inventory management
 
-🔌 **Technical Features**
+ **Technical Features**
 - External book search integration (Open Library, Google Books)
 - Caching system for API responses
 - CSRF protection
@@ -243,7 +243,7 @@ OPEN_LIBRARY_USER_AGENT=YourApp/1.0 (your@email.com)
 
 ## Security Notes
 
-⚠️ **Important for Production:**
+ **Important for Production:**
 - Change `SECRET_KEY` in `config.py`
 - Use HTTPS in production
 - Set `debug=False` in `run_server.py`
