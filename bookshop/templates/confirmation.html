@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmation | BookNest{% endblock %}
+{% block meta_description %}Your BookNest order confirmation with order number, status, and total.{% endblock %}
+
+{% block content %}
+<section class="confirm-card" aria-labelledby="confirm-title">
+    <p class="eyebrow">Order placed</p>
+    <h1 id="confirm-title">Thank you for your purchase</h1>
+    <p>Your order has been saved and is now {{ order.status }}.</p>
+
+    <dl class="book-facts confirmation-facts">
+        <div>
+            <dt>Order number</dt>
+            <dd>#{{ order.id }}</dd>
+        </div>
+        <div>
+            <dt>Total</dt>
+            <dd>{{ "%.2f"|format(order.total_eur) }} EUR</dd>
+        </div>
+        <div>
+            <dt>Date</dt>
+            <dd>{{ order.created_at }}</dd>
+        </div>
+    </dl>
+
+    <div class="button-row">
+        <a href="{{ url_for('order_bp.order_details', order_id=order.id) }}" class="btn btn-primary">View details</a>
+        <a href="{{ url_for('shop.books') }}" class="btn btn-secondary">Back to catalog</a>
+    </div>
+</section>
+{% endblock %}

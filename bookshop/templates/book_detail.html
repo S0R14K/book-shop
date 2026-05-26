@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} by {{ book.author }} | BookNest{% endblock %}
+{% block meta_description %}Buy {{ book.title }} by {{ book.author }} from BookNest. View price, category, description, stock, ISBN, year, and external API metadata.{% endblock %}
+
+{% block content %}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="{{ url_for('shop.home') }}">Home</a>
+    <span>/</span>
+    <a href="{{ url_for('shop.books') }}">Books</a>
+    <span>/</span>
+    <span>{{ book.title }}</span>
+</nav>
+
+<article class="detail-layout">
+    <section class="detail-cover" aria-label="Book cover">
+        {% if book.cover_image %}
+            <img src="{{ book.cover_image }}" alt="Cover of {{ book.title }}">
+        {% else %}
+            <span class="cover-placeholder cover-placeholder-large" aria-label="No cover available">{{ book.title[:1] }}</span>
+        {% endif %}
+    </section>
+
+    <section class="detail-info">
+        <p class="book-category">{{ book.category }}</p>
+        <h1>{{ book.title }}</h1>
+        <p class="detail-author">By {{ book.author }}</p>
+        <span class="stock-badge {% if book.stock <= 0 %}stock-empty{% endif %}">
+            {% if book.stock > 10 %}In stock{% elif book.stock > 0 %}Only {{ book.stock }} left{% else %}Out of stock{% endif %}
+        </span>
+
+        <dl class="book-facts">
+            <div>
+                <dt>Price</dt>
+                <dd>{{ "%.2f"|format(book.price_eur) }} EUR</dd>
+            </div>
+            <div>
+                <dt>Stock</dt>
+                <dd>{% if book.stock > 0 %}{{ book.stock }} available{% else %}Out of stock{% endif %}</dd>
+            </div>
+            {% if book.published_year %}
+                <div>
+                    <dt>Published</dt>
+                    <dd>{{ book.published_year }}</dd>
+                </div>
+            {% endif %}
+            {% if book.isbn %}
+                <div>
+                    <dt>ISBN</dt>
+                    <dd>{{ book.isbn }}</dd>
+                </div>
+            {% endif %}
+        </dl>
+
+        <p class="detail-description">{{ book.description }}</p>
+
+        <div class="detail-actions">
+            <form class="purchase-row" method="post" action="{{ url_for('cart_bp.add_to_cart', book_id=book.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label for="quantity">Quantity</label>
+                <input id="quantity" type="number" name="quantity" min="1" max="{{ book.stock if book.stock > 0 else 1 }}" value="1" {% if book.stock <= 0 %}disabled{% endif %}>
+                <button class="btn btn-primary" type="submit" {% if book.stock <= 0 %}disabled{% endif %}>Add to cart</button>
+            </form>
+
+            {% if session.get("user_id") %}
+                {% if book.id in wishlist_book_ids %}
+                    <form method="post" action="{{ url_for('account.remove_from_wishlist', book_id=book.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-secondary" type="submit">Remove from wishlist</button>
+                    </form>
+                {% else %}
+                    <form method="post" action="{{ url_for('account.add_to_wishlist', book_id=book.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-secondary" type="submit">Save to wishlist</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+</article>
+
+<section
+    class="info-panel"
+    id="book-enrichment"
+    data-api-url="{{ url_for('api_bp.book_enrichment', title=book.title, author=book.author) }}"
+    aria-labelledby="open-library-title"
+>
+    <div class="section-heading compact-heading">
+        <div>
+            <p class="eyebrow">External metadata</p>
+            <h2 id="open-library-title">API-enriched book data</h2>
+        </div>
+        <span class="api-badge" id="book-enrichment-source">Loading</span>
+    </div>
+    <div class="metadata-grid" id="book-enrichment-facts">
+        <p class="muted">Loading extra metadata from Open Library or Google Books...</p>
+    </div>
+    <p class="detail-description" id="book-enrichment-description"></p>
+</section>
+
+{% if related_books %}
+    <section class="section-heading">
+        <div>
+            <p class="eyebrow">You may also like</p>
+            <h2>More in {{ book.category }}</h2>
+        </div>
+    </section>
+    <section class="book-grid" aria-label="Related books">
+        {% for book in related_books %}
+            {% include "partials/book_card.html" %}
+        {% endfor %}
+    </section>
+{% endif %}
+{% endblock %}

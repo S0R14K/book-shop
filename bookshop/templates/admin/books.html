@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Books | BookNest{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Admin</p>
+    <h1>Manage books</h1>
+    <p>Add new books, update inventory, or remove books from the public catalog.</p>
+</section>
+
+<div class="admin-actions">
+    <a class="btn btn-primary" href="{{ url_for('admin.new_book') }}">Add book</a>
+    <a class="btn btn-secondary" href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+</div>
+
+<div class="table-card">
+    <table class="responsive-table">
+        <thead>
+            <tr>
+                <th>Book</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+                <tr>
+                    <td data-label="Book">
+                        <strong>{{ book.title }}</strong>
+                        <span>{{ book.author }}</span>
+                    </td>
+                    <td data-label="Category">{{ book.category }}</td>
+                    <td data-label="Price">{{ "%.2f"|format(book.price_eur) }} EUR</td>
+                    <td data-label="Stock">{{ book.stock }}</td>
+                    <td data-label="Status">
+                        <span class="status-pill">{{ "active" if book.is_active else "hidden" }}</span>
+                    </td>
+                    <td data-label="Actions">
+                        <div class="table-actions">
+                            <a class="btn btn-secondary" href="{{ url_for('admin.edit_book', book_id=book.id) }}">Edit</a>
+                            {% if book.is_active %}
+                                <form method="post" action="{{ url_for('admin.delete_book', book_id=book.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-danger" type="submit">Delete</button>
+                                </form>
+                            {% else %}
+                                <form method="post" action="{{ url_for('admin.restore_book', book_id=book.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-primary" type="submit">Restore</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | BookNest{% endblock %}
+{% block meta_description %}BookNest administrator dashboard for managing books, categories, and orders.{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Admin</p>
+    <h1>Dashboard</h1>
+    <p>Manage inventory, categories, and customer orders from one place.</p>
+</section>
+
+<section class="admin-stats" aria-label="Admin statistics">
+    <article class="stat-card"><span>{{ counts.users }}</span><small>Users</small></article>
+    <article class="stat-card"><span>{{ counts.books }}</span><small>Books</small></article>
+    <article class="stat-card"><span>{{ counts.categories }}</span><small>Categories</small></article>
+    <article class="stat-card"><span>{{ counts.orders }}</span><small>Orders</small></article>
+</section>
+
+<section class="admin-actions" aria-label="Admin actions">
+    <a class="btn btn-primary" href="{{ url_for('admin.new_book') }}">Add book</a>
+    <a class="btn btn-secondary" href="{{ url_for('admin.books') }}">Manage books</a>
+    <a class="btn btn-secondary" href="{{ url_for('admin.categories') }}">Manage categories</a>
+    <a class="btn btn-secondary" href="{{ url_for('admin.orders') }}">View orders</a>
+</section>
+
+<section class="section-heading">
+    <div>
+        <p class="eyebrow">Recent orders</p>
+        <h2>Latest activity</h2>
+    </div>
+</section>
+
+{% if recent_orders %}
+    <div class="table-card">
+        <table class="responsive-table">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                    <tr>
+                        <td data-label="Order">#{{ order.id }}</td>
+                        <td data-label="User">{{ order.email }}</td>
+                        <td data-label="Status"><span class="status-pill">{{ order.status }}</span></td>
+                        <td data-label="Total">{{ "%.2f"|format(order.total_eur or 0) }} EUR</td>
+                        <td data-label="Date">{{ order.created_at }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="empty-state"><h2>No orders yet</h2><p>New orders will appear here.</p></div>
+{% endif %}
+{% endblock %}

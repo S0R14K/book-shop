@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}BookNest is a responsive online bookstore with secure accounts, searchable books, a shopping cart, orders, and external book data from Open Library.{% endblock %}">
+    <meta name="keywords" content="online bookstore, book catalog, Flask bookstore, responsive bookstore, Open Library API">
+    <link rel="canonical" href="{{ request.base_url }}">
+
+    <meta property="og:title" content="{{ self.title()|striptags }}">
+    <meta property="og:description" content="{% block og_description %}Browse books, manage a cart, and place bookstore orders online.{% endblock %}">
+    <meta property="og:type" content="website">
+
+    <title>{% block title %}BookNest{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <header class="site-header">
+        <nav class="nav container" aria-label="Primary navigation">
+            <a href="{{ url_for('shop.home') }}" class="brand" aria-label="BookNest home">BookNest</a>
+
+            <input class="nav-toggle" type="checkbox" id="nav-toggle" aria-label="Toggle navigation">
+            <label class="nav-toggle-label" for="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+
+            <div class="nav-menu">
+                <a class="{% if current_endpoint.startswith('shop.books') or current_endpoint == 'shop.book_detail' %}active{% endif %}" href="{{ url_for('shop.books') }}">Catalog</a>
+                <a class="{% if current_endpoint == 'shop.about' %}active{% endif %}" href="{{ url_for('shop.about') }}">About</a>
+                {% if session.get("user_id") %}
+                    <a class="{% if current_endpoint.startswith('cart_bp') %}active{% endif %}" href="{{ url_for('cart_bp.view_cart') }}">Cart <span class="nav-count">{{ cart_count }}</span></a>
+                    <a class="{% if current_endpoint.startswith('account.wishlist') %}active{% endif %}" href="{{ url_for('account.wishlist') }}">Wishlist <span class="nav-count">{{ wishlist_count }}</span></a>
+                    <a class="{% if current_endpoint.startswith('order_bp') %}active{% endif %}" href="{{ url_for('order_bp.order_history') }}">Orders</a>
+                    <a class="{% if current_endpoint == 'account.profile' %}active{% endif %}" href="{{ url_for('account.profile') }}">Profile</a>
+                    {% if is_admin %}
+                        <a class="{% if current_endpoint.startswith('admin.') %}active{% endif %}" href="{{ url_for('admin.dashboard') }}">Admin</a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}">Logout</a>
+                {% else %}
+                    <a class="{% if current_endpoint == 'auth.login' %}active{% endif %}" href="{{ url_for('auth.login') }}">Login</a>
+                    <a class="nav-action {% if current_endpoint == 'auth.register' %}active{% endif %}" href="{{ url_for('auth.register') }}">Register</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main id="content" class="container page-shell">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <section class="flash-list" aria-label="Messages">
+                    {% for category, msg in messages %}
+                        <p class="flash-message flash-{{ category }}">{{ msg }}</p>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div>
+                <strong>BookNest</strong>
+                <p>A practical Flask bookstore project with database-backed shopping and API-powered discovery.</p>
+            </div>
+            <div>
+                <span>Built with Flask, SQLite, HTML, CSS, and JavaScript.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

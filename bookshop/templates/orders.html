@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders | BookNest{% endblock %}
+{% block meta_description %}View your BookNest order history and order details.{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Account</p>
+    <h1>Your orders</h1>
+</section>
+
+{% if orders %}
+    <div class="table-card">
+        <table class="responsive-table">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td data-label="Order">#{{ order.id }}</td>
+                        <td data-label="Date">{{ order.created_at }}</td>
+                        <td data-label="Status"><span class="status-pill">{{ order.status }}</span></td>
+                        <td data-label="Total">{{ "%.2f"|format(order.total_eur) }} EUR</td>
+                        <td data-label="Action">
+                            <a class="btn btn-secondary" href="{{ url_for('order_bp.order_details', order_id=order.id) }}">Details</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h2>No orders yet</h2>
+        <p>Your completed orders will appear here.</p>
+        <a class="btn btn-primary" href="{{ url_for('shop.books') }}">Browse books</a>
+    </div>
+{% endif %}
+{% endblock %}

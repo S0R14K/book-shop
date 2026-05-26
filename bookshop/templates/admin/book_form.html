@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{{ "Add Book" if mode == "new" else "Edit Book" }} | BookNest{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Admin</p>
+    <h1>{{ "Add book" if mode == "new" else "Edit book" }}</h1>
+</section>
+
+<form class="form-card admin-form" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="form-grid">
+        <div class="field">
+            <label for="title">Title</label>
+            <input id="title" name="title" required value="{{ book.get('title', '') if book.get else book.title }}">
+            {% if errors.get("title") %}<p class="field-error">{{ errors.title }}</p>{% endif %}
+        </div>
+        <div class="field">
+            <label for="author">Author</label>
+            <input id="author" name="author" required value="{{ book.get('author', '') if book.get else book.author }}">
+            {% if errors.get("author") %}<p class="field-error">{{ errors.author }}</p>{% endif %}
+        </div>
+        <div class="field">
+            <label for="category_id">Category</label>
+            {% set selected_category = book.get('category_id') if book.get else book.category_id %}
+            <select id="category_id" name="category_id" required>
+                <option value="">Choose category</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if selected_category == category.id %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            {% if errors.get("category_id") %}<p class="field-error">{{ errors.category_id }}</p>{% endif %}
+        </div>
+        <div class="field">
+            <label for="price_eur">Price EUR</label>
+            <input id="price_eur" name="price_eur" type="number" step="0.01" min="0" required value="{{ book.get('price_eur', '') if book.get else book.price_eur }}">
+            {% if errors.get("price_eur") %}<p class="field-error">{{ errors.price_eur }}</p>{% endif %}
+        </div>
+        <div class="field">
+            <label for="stock">Stock</label>
+            <input id="stock" name="stock" type="number" min="0" required value="{{ book.get('stock', '') if book.get else book.stock }}">
+            {% if errors.get("stock") %}<p class="field-error">{{ errors.stock }}</p>{% endif %}
+        </div>
+        <div class="field">
+            <label for="published_year">Published year</label>
+            <input id="published_year" name="published_year" type="number" min="1000" max="2100" value="{{ book.get('published_year', '') if book.get else book.published_year }}">
+            {% if errors.get("published_year") %}<p class="field-error">{{ errors.published_year }}</p>{% endif %}
+        </div>
+        <div class="field">
+            <label for="isbn">ISBN</label>
+            <input id="isbn" name="isbn" value="{{ book.get('isbn', '') if book.get else book.isbn }}">
+        </div>
+        <div class="field">
+            <label for="cover_image">Cover URL</label>
+            <input id="cover_image" name="cover_image" value="{{ book.get('cover_image', '') if book.get else book.cover_image }}">
+            <p class="field-help">If empty, the app will use the ISBN cover service.</p>
+        </div>
+    </div>
+
+    <div class="field">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="5">{{ book.get('description', '') if book.get else book.description }}</textarea>
+    </div>
+
+    <label class="checkbox-row">
+        {% set is_featured = book.get('featured') if book.get else book.featured %}
+        <input type="checkbox" name="featured" value="1" {% if is_featured %}checked{% endif %}>
+        Featured on homepage
+    </label>
+
+    <div class="button-row left">
+        <button class="btn btn-primary" type="submit">Save book</button>
+        <a class="btn btn-secondary" href="{{ url_for('admin.books') }}">Cancel</a>
+    </div>
+</form>
+{% endblock %}

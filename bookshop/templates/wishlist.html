@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Wishlist | BookNest{% endblock %}
+{% block meta_description %}View and manage your saved BookNest wishlist books.{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Wishlist</p>
+    <h1>Saved books</h1>
+    <p>Keep track of books you may want to buy later.</p>
+</section>
+
+{% if books %}
+    <section class="book-grid" aria-label="Wishlist books">
+        {% for book in books %}
+            {% include "partials/book_card.html" %}
+        {% endfor %}
+    </section>
+{% else %}
+    <div class="empty-state">
+        <h2>Your wishlist is empty</h2>
+        <p>Save books from the catalog or details pages to build a personal reading list.</p>
+        <a class="btn btn-primary" href="{{ url_for('shop.books') }}">Browse catalog</a>
+    </div>
+{% endif %}
+{% endblock %}

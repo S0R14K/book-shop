@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ order.id }} Details | BookNest{% endblock %}
+{% block meta_description %}BookNest order #{{ order.id }} details, purchased books, shipping information, and total price.{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Order #{{ order.id }}</p>
+    <h1>Order details</h1>
+</section>
+
+<section class="order-detail-layout">
+    <div class="table-card">
+        <table class="responsive-table">
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Author</th>
+                    <th>Qty</th>
+                    <th>Unit price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td data-label="Book">{{ item.title }}</td>
+                        <td data-label="Author">{{ item.author }}</td>
+                        <td data-label="Qty">{{ item.quantity }}</td>
+                        <td data-label="Unit price">{{ "%.2f"|format(item.price_eur) }} EUR</td>
+                        <td data-label="Total">{{ "%.2f"|format(item.price_eur * item.quantity) }} EUR</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <aside class="summary-panel">
+        <h2>Summary</h2>
+        <div class="summary-row"><span>Status</span><strong>{{ order.status }}</strong></div>
+        <div class="summary-row"><span>Total</span><strong>{{ "%.2f"|format(order.total_eur) }} EUR</strong></div>
+        <div class="summary-row"><span>Name</span><strong>{{ order.customer_name or "Not saved" }}</strong></div>
+        <div class="summary-row"><span>City</span><strong>{{ order.city or "Not saved" }}</strong></div>
+        <div class="summary-row"><span>Payment</span><strong>{{ order.payment_method or "Not saved" }}</strong></div>
+        <a href="{{ url_for('order_bp.order_history') }}" class="btn btn-secondary btn-full">Back to orders</a>
+    </aside>
+</section>
+{% endblock %}

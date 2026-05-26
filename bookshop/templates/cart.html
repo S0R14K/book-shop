@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart | BookNest{% endblock %}
+{% block meta_description %}Review your BookNest shopping cart, update quantities, convert totals, and proceed to checkout.{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Cart</p>
+    <h1>Your shopping cart</h1>
+</section>
+
+{% if items %}
+    <section class="cart-layout">
+        <div class="table-card">
+            <table class="responsive-table">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td data-label="Book">
+                                <a class="table-title" href="{{ url_for('shop.book_detail', slug=item.slug) }}">{{ item.title }}</a>
+                                <span>{{ item.author }}</span>
+                            </td>
+                            <td data-label="Qty">
+                                <form class="inline-form" action="{{ url_for('cart_bp.update_cart_item', item_id=item.id) }}" method="post">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <label class="sr-only" for="quantity-{{ item.id }}">Quantity for {{ item.title }}</label>
+                                    <input id="quantity-{{ item.id }}" type="number" name="quantity" min="1" max="{{ item.stock }}" value="{{ item.quantity }}">
+                                    <button class="btn btn-secondary" type="submit">Update</button>
+                                </form>
+                            </td>
+                            <td data-label="Price">{{ "%.2f"|format(item.price_eur) }} EUR</td>
+                            <td data-label="Subtotal">{{ "%.2f"|format(item.price_eur * item.quantity) }} EUR</td>
+                            <td data-label="Action">
+                                <form action="{{ url_for('cart_bp.remove_from_cart', item_id=item.id) }}" method="post">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button class="btn btn-danger" type="submit">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <aside class="summary-panel" aria-labelledby="cart-summary-title">
+            <h2 id="cart-summary-title">Order summary</h2>
+            <div class="summary-row">
+                <span>Total</span>
+                <strong><span id="total_eur" data-total="{{ total }}">{{ "%.2f"|format(total) }}</span> EUR</strong>
+            </div>
+
+            <label for="currency-select">Show total in another currency</label>
+            <select id="currency-select">
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
+                <option value="GEL">GEL</option>
+            </select>
+            <p id="converted-total" class="converted-total" aria-live="polite"></p>
+
+            <a href="{{ url_for('order_bp.checkout') }}" class="btn btn-primary btn-full">Checkout</a>
+            <a href="{{ url_for('shop.books') }}" class="btn btn-secondary btn-full">Continue shopping</a>
+        </aside>
+    </section>
+{% else %}
+    <div class="empty-state">
+        <h2>Your cart is empty</h2>
+        <p>Add a book from the catalog to start an order.</p>
+        <a class="btn btn-primary" href="{{ url_for('shop.books') }}">Browse catalog</a>
+    </div>
+{% endif %}
+{% endblock %}

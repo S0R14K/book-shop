@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Book Catalog | BookNest{% endblock %}
+{% block meta_description %}Search and filter the BookNest catalog by title, author, category, price, and publication year.{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Catalog</p>
+    <h1>Browse books</h1>
+    <p>Search by title, author, or category, then narrow the catalog by shelf and price.</p>
+</section>
+
+<form class="filter-panel" action="{{ url_for('shop.books') }}" method="get">
+    <div class="field field-wide">
+        <label for="q">Search</label>
+        <input id="q" type="search" name="q" placeholder="Title, author, or category" value="{{ filters.q }}">
+    </div>
+
+    <div class="field">
+        <label for="category">Category</label>
+        <select id="category" name="category">
+            <option value="">All categories</option>
+            {% for category in categories %}
+                <option value="{{ category.name }}" {% if filters.category == category.name %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="field">
+        <label for="min_price">Min price</label>
+        <input id="min_price" type="number" step="0.01" min="0" name="min_price" value="{{ filters.min_price }}">
+    </div>
+
+    <div class="field">
+        <label for="max_price">Max price</label>
+        <input id="max_price" type="number" step="0.01" min="0" name="max_price" value="{{ filters.max_price }}">
+    </div>
+
+    <div class="field">
+        <label for="sort">Sort</label>
+        <select id="sort" name="sort">
+            <option value="title_asc" {% if filters.sort == "title_asc" %}selected{% endif %}>Title A to Z</option>
+            <option value="price_asc" {% if filters.sort == "price_asc" %}selected{% endif %}>Price low to high</option>
+            <option value="price_desc" {% if filters.sort == "price_desc" %}selected{% endif %}>Price high to low</option>
+            <option value="newest" {% if filters.sort == "newest" %}selected{% endif %}>Newest first</option>
+        </select>
+    </div>
+
+    <div class="filter-actions">
+        <button class="btn btn-primary" type="submit">Apply</button>
+        <a class="btn btn-secondary" href="{{ url_for('shop.books') }}">Reset</a>
+    </div>
+</form>
+
+<section class="section-heading">
+    <div>
+        <p class="eyebrow">
+            Showing {{ pagination.start }}-{{ pagination.end }} of {{ pagination.total_results }} results
+        </p>
+        <h2>Available books</h2>
+    </div>
+</section>
+
+{% if books %}
+    <section class="book-grid" aria-label="Books">
+        {% for book in books %}
+            {% include "partials/book_card.html" %}
+        {% endfor %}
+    </section>
+
+    <nav class="pagination" aria-label="Catalog pagination">
+        {% if pagination.has_prev %}
+            <a class="btn btn-secondary" href="{{ url_for('shop.books', page=pagination.prev_page, **pagination.base_args) }}">Previous</a>
+        {% else %}
+            <span class="btn btn-secondary disabled">Previous</span>
+        {% endif %}
+        <span>Page {{ pagination.page }} of {{ pagination.total_pages }}</span>
+        {% if pagination.has_next %}
+            <a class="btn btn-secondary" href="{{ url_for('shop.books', page=pagination.next_page, **pagination.base_args) }}">Next</a>
+        {% else %}
+            <span class="btn btn-secondary disabled">Next</span>
+        {% endif %}
+    </nav>
+{% else %}
+    <div class="empty-state">
+        <h2>No local books found</h2>
+        <p>Try a different search term or clear the filters.</p>
+    </div>
+{% endif %}
+
+{% if filters.q %}
+    <section class="external-results" aria-labelledby="external-title">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">External API</p>
+                <h2 id="external-title">Book API matches</h2>
+            </div>
+            {% if external_status %}
+                <span class="api-badge">
+                    {{ external_status.provider }}
+                    {% if external_status.cached %}cache{% else %}live{% endif %}
+                </span>
+            {% endif %}
+        </div>
+
+        {% if external_status and external_status.error %}
+            <p class="api-message">{{ external_status.error }}</p>
+        {% endif %}
+
+        {% if external_books %}
+            <div class="external-grid">
+                {% for item in external_books %}
+                    <article class="external-card">
+                        {% if item.cover_image %}
+                            <img src="{{ item.cover_image }}" alt="Cover of {{ item.title }}" loading="lazy">
+                        {% else %}
+                            <span class="cover-placeholder" aria-label="No cover available">{{ item.title[:1] }}</span>
+                        {% endif %}
+                        <div>
+                            <h3>{{ item.title }}</h3>
+                            <p>{{ item.authors }}</p>
+                            {% if item.published_year %}<small>First published {{ item.published_year }}</small>{% endif %}
+                            {% if item.isbn %}<small>ISBN {{ item.isbn }}</small>{% endif %}
+                            <small>Source: {{ item.provider }}</small>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="muted">No external matches are available right now. The local catalog still works normally.</p>
+        {% endif %}
+    </section>
+{% endif %}
+{% endblock %}

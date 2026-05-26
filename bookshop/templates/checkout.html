@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout | BookNest{% endblock %}
+{% block meta_description %}Complete your BookNest order with validated billing and shipping information.{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Checkout</p>
+    <h1>Complete your order</h1>
+</section>
+
+<section class="checkout-layout">
+    <form class="form-card" action="{{ url_for('order_bp.checkout') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="field">
+            <label for="name">Full name</label>
+            <input id="name" type="text" name="name" autocomplete="name" required value="{{ form_data.get('name', '') }}">
+        </div>
+
+        <div class="field">
+            <label for="address">Address</label>
+            <input id="address" type="text" name="address" autocomplete="street-address" required value="{{ form_data.get('address', '') }}">
+        </div>
+
+        <div class="field">
+            <label for="city">City</label>
+            <input id="city" type="text" name="city" autocomplete="address-level2" required value="{{ form_data.get('city', '') }}">
+        </div>
+
+        <div class="field">
+            <label for="payment">Payment method</label>
+            <select id="payment" name="payment" required>
+                {% for key, label in payment_methods.items() %}
+                    <option value="{{ key }}" {% if form_data.get('payment', 'card') == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Place order</button>
+    </form>
+
+    <aside class="summary-panel" aria-labelledby="checkout-summary-title">
+        <h2 id="checkout-summary-title">Order summary</h2>
+        <ul class="summary-list">
+            {% for item in items %}
+                <li>
+                    <span>{{ item.title }} x {{ item.quantity }}</span>
+                    <strong>{{ "%.2f"|format(item.price_eur * item.quantity) }} EUR</strong>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="summary-row summary-total">
+            <span>Total</span>
+            <strong>{{ "%.2f"|format(total) }} EUR</strong>
+        </div>
+    </aside>
+</section>
+{% endblock %}

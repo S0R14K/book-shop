@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Profile | BookNest{% endblock %}
+{% block meta_description %}View your BookNest account profile, cart count, wishlist count, and order count.{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Account</p>
+    <h1>Your profile</h1>
+    <p>Session-protected account details and shopping activity.</p>
+</section>
+
+<section class="profile-grid">
+    <article class="info-panel">
+        <h2>Account</h2>
+        <dl class="profile-list">
+            <div><dt>Email</dt><dd>{{ user.email }}</dd></div>
+            <div><dt>Role</dt><dd>{{ "Admin" if user.is_admin else "Customer" }}</dd></div>
+            <div><dt>Joined</dt><dd>{{ user.created_at }}</dd></div>
+        </dl>
+    </article>
+    <article class="stat-card"><span>{{ cart_count }}</span><small>Cart items</small></article>
+    <article class="stat-card"><span>{{ wishlist_count }}</span><small>Wishlist books</small></article>
+    <article class="stat-card"><span>{{ order_count }}</span><small>Orders</small></article>
+</section>
+
+<div class="button-row left">
+    <a class="btn btn-primary" href="{{ url_for('account.wishlist') }}">Open wishlist</a>
+    <a class="btn btn-secondary" href="{{ url_for('order_bp.order_history') }}">View orders</a>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found | BookNest{% endblock %}
+{% block meta_description %}The requested BookNest page could not be found.{% endblock %}
+
+{% block content %}
+<section class="empty-state">
+    <h1>Page not found</h1>
+    <p>The page you requested does not exist or has moved.</p>
+    <a class="btn btn-primary" href="{{ url_for('shop.home') }}">Go home</a>
+</section>
+{% endblock %}

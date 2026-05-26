@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}About BookNest | Student Bookstore Project{% endblock %}
+{% block meta_description %}Learn how BookNest satisfies a university web development project using Flask, SQLite, sessions, responsive design, SEO, and Open Library API integration.{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Project overview</p>
+    <h1>About BookNest</h1>
+    <p>BookNest is a practical online bookstore built with Flask, SQLite, HTML, CSS, and JavaScript.</p>
+</section>
+
+<section class="info-grid">
+    <article class="info-panel">
+        <h2>Application features</h2>
+        <ul class="check-list">
+            <li>Responsive home page, catalog, details, cart, checkout, and account pages</li>
+            <li>User registration, login, logout, and protected cart/order pages</li>
+            <li>SQLite tables for users, categories, books, cart items, orders, and order items</li>
+            <li>Open Library API data for external covers, authors, ISBNs, and descriptions</li>
+            <li>SEO-friendly titles, meta descriptions, semantic HTML, alt text, and clean URLs</li>
+        </ul>
+    </article>
+
+    <article class="info-panel">
+        <h2>Database relationships</h2>
+        <ul class="check-list">
+            <li>One category can contain many books</li>
+            <li>One user can have many cart items and many orders</li>
+            <li>One cart item belongs to one user and one book</li>
+            <li>One order can contain many order items</li>
+            <li>One order item stores the book, quantity, and price at purchase time</li>
+        </ul>
+    </article>
+
+    <article class="info-panel">
+        <h2>Session management</h2>
+        <p>After login, Flask stores the user id and email in a signed session cookie. Protected routes check that session before showing cart, checkout, and order pages. Logout clears the session.</p>
+    </article>
+
+    <article class="info-panel">
+        <h2>External API</h2>
+        <p>Open Library is useful because the store can enrich local book records with public book metadata such as cover images, authors, publication years, ISBNs, and work descriptions.</p>
+    </article>
+</section>
+{% endblock %}

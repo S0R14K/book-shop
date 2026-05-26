@@ -1,0 +1,39 @@
+<article class="book-card">
+    <a class="book-cover-link" href="{{ url_for('shop.book_detail', slug=book.slug) }}">
+        {% if book.cover_image %}
+            <img src="{{ book.cover_image }}" alt="Cover of {{ book.title }}" loading="lazy">
+        {% else %}
+            <span class="cover-placeholder" aria-label="No cover available">{{ book.title[:1] }}</span>
+        {% endif %}
+    </a>
+
+    <div class="book-card-body">
+        <p class="book-category">{{ book.category }}</p>
+        <h3><a href="{{ url_for('shop.book_detail', slug=book.slug) }}">{{ book.title }}</a></h3>
+        <p class="book-author">By {{ book.author }}</p>
+        <p class="book-price">{{ "%.2f"|format(book.price_eur) }} EUR</p>
+    </div>
+
+    <div class="book-card-actions">
+        <a class="btn btn-secondary" href="{{ url_for('shop.book_detail', slug=book.slug) }}">Details</a>
+        <form method="post" action="{{ url_for('cart_bp.add_to_cart', book_id=book.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-primary" type="submit" {% if book.stock <= 0 %}disabled{% endif %}>
+                {% if book.stock <= 0 %}Sold out{% else %}Add{% endif %}
+            </button>
+        </form>
+        {% if session.get("user_id") %}
+            {% if book.id in wishlist_book_ids %}
+                <form method="post" action="{{ url_for('account.remove_from_wishlist', book_id=book.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-secondary" type="submit">Saved</button>
+                </form>
+            {% else %}
+                <form method="post" action="{{ url_for('account.add_to_wishlist', book_id=book.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-secondary" type="submit">Wishlist</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+</article>

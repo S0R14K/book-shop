@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Orders | BookNest{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Admin</p>
+    <h1>Manage orders</h1>
+    <p>View customer orders and update fulfillment status.</p>
+</section>
+
+{% if orders %}
+    <div class="table-card">
+        <table class="responsive-table">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>User</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Update</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td data-label="Order">#{{ order.id }}</td>
+                        <td data-label="User">{{ order.email }}</td>
+                        <td data-label="Customer">
+                            <strong>{{ order.customer_name or "Not saved" }}</strong>
+                            <span>{{ order.city or "" }}</span>
+                        </td>
+                        <td data-label="Total">{{ "%.2f"|format(order.total_eur or 0) }} EUR</td>
+                        <td data-label="Status"><span class="status-pill">{{ order.status }}</span></td>
+                        <td data-label="Update">
+                            <form class="inline-form" method="post" action="{{ url_for('admin.update_order_status', order_id=order.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <select name="status" aria-label="Order status">
+                                    {% for status in statuses %}
+                                        <option value="{{ status }}" {% if order.status == status %}selected{% endif %}>{{ status }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="btn btn-primary" type="submit">Save</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="empty-state"><h2>No orders yet</h2><p>Orders will appear after customers check out.</p></div>
+{% endif %}
+{% endblock %}

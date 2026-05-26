@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Categories | BookNest{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <p class="eyebrow">Admin</p>
+    <h1>Manage categories</h1>
+</section>
+
+<form class="filter-panel" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field field-wide">
+        <label for="name">New category</label>
+        <input id="name" name="name" placeholder="Category name" required>
+    </div>
+    <div class="filter-actions">
+        <button class="btn btn-primary" type="submit">Add category</button>
+    </div>
+</form>
+
+<div class="table-card">
+    <table class="responsive-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Books</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+                <tr>
+                    <td data-label="Name">
+                        <form class="inline-form" method="post" action="{{ url_for('admin.edit_category', category_id=category.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input name="name" value="{{ category.name }}" required>
+                            <button class="btn btn-secondary" type="submit">Save</button>
+                        </form>
+                    </td>
+                    <td data-label="Books">{{ category.book_count }}</td>
+                    <td data-label="Actions">
+                        <form method="post" action="{{ url_for('admin.delete_category', category_id=category.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button class="btn btn-danger" type="submit" {% if category.book_count %}disabled{% endif %}>Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
